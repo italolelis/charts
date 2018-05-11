@@ -1,0 +1,13 @@
+apiVersion: v1
+description: Janus is a lightweight API Gateway and Management Platform.
+engine: gotpl
+home: https://github.com/hellofresh/janus
+icon: https://github.com/hellofresh/janus/blob/master/janus-logo.png
+maintainers:
+- name: italolelis
+  email: italolelis@gmail.com
+name: janus
+sources:
+- https://github.com/hellofresh/janus
+version: 0.1.0
+appVersion: 3.7.0

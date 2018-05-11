@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "janus.fullname" . }}
+  labels:
+    app: {{ template "janus.name" . }}
+    chart: {{ template "janus.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+
+data:
+{{- if .Values.env.open }}
+{{ toYaml .Values.env.open | indent 2 }}
+{{- end }}

@@ -1,0 +1,72 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "janus.fullname" . }}
+  labels:
+    app: {{ template "janus.name" . }}
+    chart: {{ template "janus.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "janus.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "janus.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.mongodb.enabled }}
+            - name: "DATABASE_DSN"
+              value: "mongodb://{{ template "mongodb.dsn" . }}"
+            - name: "BACKEND_UPDATE_FREQUENCY"
+              value: "1s"
+            {{- end }}
+            {{- if .Values.ssl.insecureSkipVerify }}
+                        - name: "BACKEND_UPDATE_FREQUENCY"
+              value: "1s"
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "janus.fullname" . }}
+            - secretRef:
+                name: {{ template "janus.fullname" . }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            - name: admin-http
+              containerPort: {{ .Values.service.adminPort }}
+              protocol: TCP     
+          {{- with .Values.probes.liveness }}
+          livenessProbe:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with .Values.probes.readiness }}
+          readinessProbe:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

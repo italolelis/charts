@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "janus.fullname" . }}
+  labels:
+    app: {{ template "janus.name" . }}
+    chart: {{ template "janus.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.adminPort }}
+      targetPort: admin-http
+      protocol: TCP
+      name: admin-http
+  selector:
+    app: {{ template "janus.name" . }}
+    release: {{ .Release.Name }}
